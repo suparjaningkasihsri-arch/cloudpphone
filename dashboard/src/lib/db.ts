@@ -1,12 +1,17 @@
 import { neon } from '@neondatabase/serverless';
 
-let client: ReturnType<typeof neon> | null = null;
+// Tipe hasil dibuat eksplisit: setiap query mengembalikan array baris.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type Row = Record<string, any>;
+export type Query = (strings: TemplateStringsArray, ...values: unknown[]) => Promise<Row[]>;
 
-export function sql() {
+let client: Query | null = null;
+
+export function sql(): Query {
   if (!client) {
     const url = process.env.DATABASE_URL;
     if (!url) throw new Error('DATABASE_URL belum diatur');
-    client = neon(url);
+    client = neon(url) as unknown as Query;
   }
   return client;
 }

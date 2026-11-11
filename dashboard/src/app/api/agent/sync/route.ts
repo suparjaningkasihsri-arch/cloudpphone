@@ -125,7 +125,8 @@ export async function POST(req: Request) {
   if (claimed.length > 0) {
     const phoneRows = await q`select id, name, port, android, width, height, dpi
                               from phones where machine_id = ${mid}`;
-    const byId = new Map(phoneRows.map((p) => [p.id as string, p]));
+    const byId = new Map<string, (typeof phoneRows)[number]>();
+    for (const p of phoneRows) byId.set(p.id as string, p);
     commands = claimed
       .map((c) => ({ id: Number(c.id), action: c.action, phone: byId.get(c.phone_id as string) ?? null }))
       .filter((c) => c.phone);
